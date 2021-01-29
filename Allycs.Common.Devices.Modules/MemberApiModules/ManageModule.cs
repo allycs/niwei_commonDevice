@@ -1,0 +1,75 @@
+﻿using Allycs.Common.Devices.Dtos;
+using Allycs.Common.Devices.Services;
+using Allycs.Core;
+using Microsoft.Extensions.Logging;
+using Nancy;
+using Nancy.ModelBinding;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Allycs.Common.Devices.Modules.MemberApiModules
+{
+    public class ManageModule : NancyAuthApiModule
+    {
+        private readonly IMemberService _memberService;
+        private readonly IMemberTokenService _memberTokenService;
+        IVerificationCodeService _verificationCodeService;
+        private readonly ILoginValidatableService _loginValidatableService;
+
+        private readonly IMemberLoginLogService _memberLoginLogService;
+        protected readonly ILogger<ManageModule> _logger;
+
+        public ManageModule(
+            IMemberService memberService,
+            IMemberTokenService memberTokenService,
+            ILoginValidatableService loginValidatableService,
+            IVerificationCodeService verificationCodeService,
+            IMemberLoginLogService memberLoginLogService,
+            ILogger<ManageModule> logger):base(memberTokenService, memberService)
+        {
+            _memberService = memberService;
+            _memberTokenService = memberTokenService;
+            _loginValidatableService = loginValidatableService;
+            _verificationCodeService = verificationCodeService;
+            _memberLoginLogService = memberLoginLogService;
+            _logger = logger;
+            Get("/check-auth", _ => CheckAuth());
+            Post("/renew-password", _ => DoRenewPasswordAsync());
+        }
+
+        private Response CheckAuth()
+        {
+            return Ok(CurrentToken);
+        }
+        private async Task<Response> DoRenewPasswordAsync()
+        {
+            var cmd = this.BindAndValidate<RenewPasswordCmd>();
+            if (!ModelValidationResult.IsValid)
+                return BadRequest(ModelValidationResult.Errors.First().Value.ToString());
+
+            var timeNow = DateTime.Now;
+            var err = await _loginValidatableService.CheckRenewPasswordCmdValidatableAsync(CurrentMemberId,cmd, ClientIP, timeNow).ConfigureAwait(false);
+            if (!err.IsNullOrWhiteSpace())
+                return PreconditionFailed(err);
+            var verificationCode = await _verificationCodeService.GetAvailableCode(CurrentMemberId, cmd.CheckCode, CodeType.RenewPassword).ConfigureAwait(false);
+           
+            await _verificationCodeService.UpdateVerificationCodeToDisabledByUsed(verificationCode.Id).ConfigureAwait(false);
+          
+            var passwordFormat = EnumHelper.Random(PasswordFormatType.None);
+            var passwordSalt = HashGenerator.Salt();
+            var password = HashGenerator.Encode(cmd.Password, passwordFormat, passwordSalt);
+            var accounts = await _memberService.GetMemberAccountsByMemberIdAsync(CurrentMemberId).ConfigureAwait(false);
+            foreach (var item in accounts)
+            {
+                item.Password = password;
+                item.PasswordSalt = passwordSalt;
+                item.PasswordFormat = passwordFormat;
+                await _memberService.UpdateMemberAccountAsync(item).ConfigureAwait(false);
+            }
+            return Ok(new { message = $"密码已更新,请重新登录！" });
+        }
+    }
+}

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Allycs.Common.Devices\Allycs.Common.Devices.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Allycs.Core">
+      <HintPath>..\Allycs.Common.Lib\AllycsCore\Allycs.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AllycsCRUD">
+      <HintPath>..\Allycs.Common.Lib\AllycsCRUD\AllycsCRUD.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
