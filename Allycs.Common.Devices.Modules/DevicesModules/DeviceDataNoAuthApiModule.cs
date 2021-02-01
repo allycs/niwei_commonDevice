@@ -12,15 +12,19 @@
     using Allycs.Core;
     using System.IO;
     using Allycs.Common.Devices.Dtos;
+    using Allycs.Common.Devices.Services;
 
     public class DeviceDataNoAuthApiModule : BaseNancyModule
     {
         protected readonly AppSettings _settings;
+        protected readonly IDevicesService _devicesService;
         protected readonly ILogger<DeviceDataNoAuthApiModule> _logger;
         public DeviceDataNoAuthApiModule(
+            IDevicesService devicesService,
             IOptionsSnapshot<AppSettings> option,
         ILogger<DeviceDataNoAuthApiModule> logger) : base("device", "api", "")
         {
+            _devicesService = devicesService;
             _settings = option.Value;
             _logger = logger;
 

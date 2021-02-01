@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Allycs.Common.Devices.Entities;
-using Dapper;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-
-namespace Allycs.Common.Devices.Services
+﻿namespace Allycs.Common.Devices.Services
 {
+    using Allycs.Common.Devices.Entities;
+    using Dapper;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using System.Threading.Tasks;
+
     public class DevicesService : PostgresService, IDevicesService
     {
         private readonly AppSettings _settings;
@@ -21,12 +18,28 @@ namespace Allycs.Common.Devices.Services
             _settings = option.Value;
             _logger = logger;
         }
-        public async Task<bool> ExistDeviceAsync(string id)
+
+        public async Task<bool> ExistDeviceInfoAsync(string id)
         {
-            using (var conn = CreateConnection())
-            {
-                return (await conn.RecordCountAsync<DeviceInfo>($" WHERE id='{id}'").ConfigureAwait(false)) > 0;
-            }
+            using var conn = CreateConnection();
+            return (await conn.RecordCountAsync<DeviceInfo>($" WHERE id='{id}'").ConfigureAwait(false)) > 0;
+        }
+
+        public async Task<bool> NewDeviceInfoAsync(DeviceInfo entity)
+        {
+            using var conn = CreateConnection();
+            return await conn.InsertAsync<DeviceInfo>(entity).ConfigureAwait(false);
+        }
+
+        public async Task<DeviceInfo> GetDeviceInfoAsync(string id)
+        {
+            using var conn = CreateConnection();
+            return await conn.GetAsync<DeviceInfo>(id).ConfigureAwait(false);
+        }
+        public async Task<bool> UpdateDeviceInfoAsync(DeviceInfo entity)
+        {
+            using var conn = CreateConnection();
+            return await conn.UpdateAsync(entity).ConfigureAwait(false)>0;
         }
     }
 }

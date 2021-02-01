@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Allycs.Common.Devices.Services
+﻿namespace Allycs.Common.Devices.Services
 {
+    using Entities;
+    using System.Threading.Tasks;
+
     public interface IDevicesService
     {
-        Task<bool> ExistDeviceAsync(string id);
+        Task<bool> ExistDeviceInfoAsync(string id);
+
+        Task<bool> NewDeviceInfoAsync(DeviceInfo entity);
+        Task<DeviceInfo> GetDeviceInfoAsync(string id);
+        Task<bool> UpdateDeviceInfoAsync(DeviceInfo entity);
     }
 }
