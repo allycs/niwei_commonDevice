@@ -10,5 +10,6 @@
         Task<bool> NewDeviceInfoAsync(DeviceInfo entity);
         Task<DeviceInfo> GetDeviceInfoAsync(string id);
         Task<bool> UpdateDeviceInfoAsync(DeviceInfo entity);
+        Task<bool> NewDeviceDataAsync(DeviceData entity);
     }
 }

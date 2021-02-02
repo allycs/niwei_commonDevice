@@ -7,7 +7,7 @@
     public class DeviceInfo
     {
         [Key]
-        public string Id { get; set; }
+        public string Id { get; set; } = ObjectId.NewId();
 
         public string DeviceCode { get; set; }
         public string DeviceName { get; set; }
