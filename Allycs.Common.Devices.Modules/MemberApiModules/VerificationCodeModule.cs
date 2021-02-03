@@ -70,7 +70,7 @@
         {
             var exist = await _verificationCodeService.ExistAvailableRegistCodeByClientIpAsync(ClientIP).ConfigureAwait(false);
             if (exist)
-                return Ok(new { code = await _verificationCodeService.GetAvailableRegistCodeByClientIpAsync(ClientIP).ConfigureAwait(false));
+                return Ok(new { code = await _verificationCodeService.GetAvailableRegistCodeByClientIpAsync(ClientIP).ConfigureAwait(false) });
             else
             {
                 var help = VerifyCodeHelper.GetSingleObj();
