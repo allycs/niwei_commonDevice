@@ -67,3 +67,26 @@
 返回体
 "安全登出"
 ```
+
+## RegistCode
+>  `Get */code/regist` 获取注册验证码
+>> 伪JSON格式（请使用标准JSON）
+``` 
+请求体
+
+返回体
+{
+    "code":"验证码"
+}
+```
+## RegistCode
+>  `Post */code/regist/check/{code}` 验证注册验证码
+>> 伪JSON格式（请使用标准JSON）
+``` 
+请求体
+
+返回体
+{
+    "message":"验证合法"
+}
+```

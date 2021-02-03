@@ -51,12 +51,11 @@ CREATE TABLE verification_code
 (
 	id serial PRIMARY KEY,
 	member_id character(24) NULL,
-	nation_code character varying(10) NOT NULL DEFAULT '86',
-	phone character varying(28) NULL,
 	code character varying(8) NOT NULL,
 	type integer NOT NULL DEFAULT 0,
 	created_on timestamp NOT NULL,
 	is_disabled boolean NOT NULL DEFAULT false,
+	client_ip character varying(128) NULL,
 	reason character varying(128) NULL,
 	disabled_on timestamp NULL
 );

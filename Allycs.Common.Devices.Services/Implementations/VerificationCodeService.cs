@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Allycs.Common.Devices.Services.Implementations
+namespace Allycs.Common.Devices.Services
 {
     using Allycs.Common.Devices.Entities;
     using Allycs.Core;
@@ -79,11 +79,30 @@ namespace Allycs.Common.Devices.Services.Implementations
             var whereSql = $"WHERE is_disabled=false " + (memberId.IsNullOrWhiteSpace() ? " AND member_id IS NULL " : " AND member_id='{memberId}' ") + " AND code='{code.ToUpper()}' AND type ={(int)type} ";
             return (await conn.RecordCountAsync<VerificationCode>(whereSql).ConfigureAwait(false)) > 0;
         }
+        public async Task<bool> ExistAvailableCodeWithoutMemberAsync(string clientIp, string code, CodeType type)
+        {
+            using var conn = CreateConnection();
+            var whereSql = $"WHERE is_disabled=false  AND member_id IS NULL  AND code='{code.ToUpper()}' AND type ={(int)type} AND client_ip='{clientIp}'";
+            return (await conn.RecordCountAsync<VerificationCode>(whereSql).ConfigureAwait(false)) > 0;
+        }
+        public async Task<bool> ExistAvailableRegistCodeByClientIpAsync(string clientIp)
+        {
+            using var conn = CreateConnection();
+            var whereSql = $"WHERE is_disabled=false  AND member_id IS NULL   AND type ={(int)CodeType.Regist} AND client_ip='{clientIp}'";
+            return (await conn.RecordCountAsync<VerificationCode>(whereSql).ConfigureAwait(false)) > 0;
+        }
         public async Task<VerificationCode> GetAvailableCode(string memberId, string code, CodeType type)
         {
             using var conn = CreateConnection();
             var whereSql = $"WHERE is_disabled=false " + (memberId.IsNullOrWhiteSpace() ? " AND member_id IS NULL " : $" AND member_id='{memberId}' ") + " AND code='{code.ToUpper()}' AND type ={(int)type} ORDER BY created_on DESC ";
 
+            return (await conn.GetListAsync<VerificationCode>(whereSql).ConfigureAwait(false)).FirstOrDefault();
+        }
+        public async Task<VerificationCode> GetAvailableRegistCodeByClientIpAsync(string ClientIp)
+        {
+            await UpdateVerificationCodeToDisabledByTimeAsync().ConfigureAwait(false);
+            using var conn = CreateConnection();
+            var whereSql = $"WHERE is_disabled=false  AND member_id IS NULL  AND client_ip='{ClientIp}' AND type ={(int)CodeType.Regist} ORDER BY created_on DESC ";
             return (await conn.GetListAsync<VerificationCode>(whereSql).ConfigureAwait(false)).FirstOrDefault();
         }
     }
