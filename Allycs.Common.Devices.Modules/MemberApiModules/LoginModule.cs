@@ -30,7 +30,7 @@ namespace Allycs.Common.Devices.Modules.MemberApiModules
             ILoginValidatableService loginValidatableService,
             IVerificationCodeService verificationCodeService,
             IMemberLoginLogService memberLoginLogService,
-            ILogger<LoginModule> logger)
+            ILogger<LoginModule> logger) : base("member", "api", "")
         {
             _memberService = memberService;
             _memberTokenService = memberTokenService;

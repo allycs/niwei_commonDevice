@@ -34,10 +34,10 @@
             ILogger<VerificationCodeModule> logger)
         {
             _memberService = memberService;
+            _verificationCodeService = verificationCodeService;
             _validatableCodeService = validatableCodeService;
             _memberTokenService = memberTokenService;
             _loginValidatableService = loginValidatableService;
-            _verificationCodeService = verificationCodeService;
             _memberLoginLogService = memberLoginLogService;
             _logger = logger;
             //注册验证码
@@ -45,12 +45,6 @@
             Post("/code/regist/check/{code}", p => CheckRegistCodeAsync((string)p.code));
             ///短信验证码（验证码随机生成）
             Post("/code/verification", _ => GetCodeAsync());
-            //修改密码验证码
-            Get("/code/renew-password", p => GetRenewPasswordCodeAsync());
-            Post("/code/renew-password", p => CheckRenewPasswordCodeAsync());
-            //身份验证码
-            Get("/code/authentication/{phone}", p => SendAuthenticationCodeAsync((string)p.phone));
-            Post("/code/authentication/check", p => CheckAuthenticationCodeAsync());
         }
 
         private async Task<Response> GetCodeAsync()
@@ -90,47 +84,7 @@
 
         private async Task<Response> CheckRegistCodeAsync(string code)
         {
-            var cmd = this.BindAndValidate<CheckCodeCmd>();
             var err = await _validatableCodeService.CheckRegistCodeAsync(code, ClientIP).ConfigureAwait(false);
-            if (!err.IsNullOrWhiteSpace())
-                return PreconditionFailed(err);
-            return Ok(new { message = "验证合法" });
-        }
-
-        private async Task<Response> GetRenewPasswordCodeAsync()
-        {
-          
-            if (!await _memberService.ExistMobilePhoneAsync(phone).ConfigureAwait(false))
-                return PreconditionFailed("手机号未注册");
-            var memberInfo = await _memberService.GetMemberInfoByPhoneAsync(phone).ConfigureAwait(false);
-            if (memberInfo.Type == MemberType.Employee && !memberInfo.MainMemberId.IsNullOrWhiteSpace())
-                return PreconditionFailed("子账号无权修改密码，请主账号联系管理员");
-            var result = await _smsService.SendRenewPasswordCodeAsync(phone, SmsCode.GetSmsCode(6), ClientIP).ConfigureAwait(false);
-            return Ok(new { message = result });
-        }
-
-        private async Task<Response> CheckRenewPasswordCodeAsync()
-        {
-            var cmd = this.BindAndValidate<CheckCodeCmd>();
-            var err = await _sendSmsValidatableService.CheckRenewPasswordCodeAsync(cmd, ClientIP).ConfigureAwait(false);
-            if (!err.IsNullOrWhiteSpace())
-                return PreconditionFailed(err);
-            return Ok(new { message = "验证合法" });
-        }
-
-        private async Task<Response> SendAuthenticationCodeAsync(string phone)
-        {
-            var can = await _smsService.CanSendCodeAsync(phone).ConfigureAwait(false);
-            if (!can)
-                return PreconditionFailed("验证码发送过于频繁");
-            var result = await _smsService.SendAuthenticationCodeAsync(phone, SmsCode.GetSmsCode(6), ClientIP).ConfigureAwait(false);
-            return Ok(new { message = result });
-        }
-
-        private async Task<Response> CheckAuthenticationCodeAsync()
-        {
-            var cmd = this.BindAndValidate<CheckCodeCmd>();
-            var err = await _sendSmsValidatableService.CheckAuthenticationCodeAsync(cmd, ClientIP).ConfigureAwait(false);
             if (!err.IsNullOrWhiteSpace())
                 return PreconditionFailed(err);
             return Ok(new { message = "验证合法" });

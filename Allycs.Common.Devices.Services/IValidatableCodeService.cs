@@ -11,7 +11,7 @@ namespace Allycs.Common.Devices.Services
         Task<string> CheckVerificationCodeCmdValidatableAsync(VerificationCodeCmd cmd, string clientIp, DateTime timeNow);
         
         Task<string> CheckRegistCodeAsync(string code, string clientIp);
-        Task<string> CheckRenewPasswordCodeAsync(CheckCodeCmd cmd, string clientIp);
+        Task<string> CheckRenewPasswordCodeAsync(string memberId, string clientIp,string code);
         Task<string> CheckAuthenticationCodeAsync(CheckCodeCmd cmd, string clientIp);
         Task<string> CheckCodeAsync(CheckCodeCmd cmd, CodeType type, string clientIp);
     }

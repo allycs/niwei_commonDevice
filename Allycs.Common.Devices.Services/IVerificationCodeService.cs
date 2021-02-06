@@ -8,7 +8,8 @@
     public interface IVerificationCodeService
     {
         Task<bool> ExistAvailableCodeWithoutMemberAsync(string clientIp, string code, CodeType type);
-
+        Task<bool> ExistAvailableRenewPasswordCodeAsync(string memberId,string clientIp);
+        Task<bool> ExistAvailableRenewPasswordCodeAsync(string memberId,string clientIp,string code);
         Task<bool> ExistAvailableRegistCodeByClientIpAsync(string clientIp);
 
         Task<int> NewVerificationCodeAsync(VerificationCode entity);
@@ -25,6 +26,7 @@
 
         Task<VerificationCode> GetAvailableCode(string memberId, string code, CodeType type);
 
-        Task<VerificationCode> GetAvailableRegistCodeByClientIpAsync(string ClientIp);
+        Task<VerificationCode> GetAvailableRegistCodeByClientIpAsync(string clientIp);
+        Task<VerificationCode> GetAvailableRenewPasswordCodeByClientIpAsync(string memberId, string clientIp);
     }
 }

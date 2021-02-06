@@ -13,18 +13,18 @@ namespace Allycs.Common.Devices.Services
     using System.Threading.Tasks;
     using Allycs.Core;
 
-    public class ValidatableService : PostgresService, IValidatableCodeService
+    public class ValidatableCodeService : PostgresService, IValidatableCodeService
     {
-        private readonly ILogger<ValidatableService> _logger;
+        private readonly ILogger<ValidatableCodeService> _logger;
         private readonly IMemberService _memberService;
         private readonly IVerificationCodeService _verificationCodeService;
         private readonly IMemberLoginLogService _memberLoginLogService;
 
-        public ValidatableService(IOptionsSnapshot<AppSettings> option,
+        public ValidatableCodeService(IOptionsSnapshot<AppSettings> option,
             IMemberService memberService,
             IVerificationCodeService verificationCodeService,
             IMemberLoginLogService memberLoginLogService,
-            ILogger<ValidatableService> logger)
+            ILogger<ValidatableCodeService> logger)
             : base(option)
         {
             _logger = logger;
@@ -60,9 +60,15 @@ namespace Allycs.Common.Devices.Services
             return await CheckCodeAsync(new CheckCodeCmd { CheckCode=code,}, CodeType.Regist, clientIp).ConfigureAwait(false);
         }
 
-        public async Task<string> CheckRenewPasswordCodeAsync(CheckCodeCmd cmd, string clientIp)
+        public async Task<string> CheckRenewPasswordCodeAsync(string memberId, string clientIp, string code)
         {
-            return await CheckCodeAsync(cmd, CodeType.RenewPassword, clientIp).ConfigureAwait(false);
+            if (code.IsNullOrWhiteSpace())
+                return "验证码不可为空";
+            if (!await _verificationCodeService.ExistAvailableRenewPasswordCodeAsync(memberId, clientIp, code).ConfigureAwait(false))
+            {
+                return "验证码错误";
+            }
+            return null;
         }
 
         public async Task<string> CheckAuthenticationCodeAsync(CheckCodeCmd cmd, string clientIp)
@@ -72,7 +78,6 @@ namespace Allycs.Common.Devices.Services
 
         public async Task<string> CheckCodeAsync(CheckCodeCmd cmd, CodeType type, string clientIp)
         {
-           
             if (cmd.CheckCode.IsNullOrWhiteSpace())
                 return "验证码不可为空";
             if (!await _verificationCodeService.ExistAvailableCode(cmd.MemberId, cmd.CheckCode, type).ConfigureAwait(false))

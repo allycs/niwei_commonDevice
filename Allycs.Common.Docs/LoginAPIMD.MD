@@ -1,3 +1,5 @@
+# http://47.108.194.100:52800/allycs/server/member/v1/api
+
 ## Login
 >  `POST */login` 用户登录
 >> 伪JSON格式（请使用标准JSON）

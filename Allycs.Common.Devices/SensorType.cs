@@ -1,5 +1,8 @@
 ﻿namespace Allycs.Common.Devices
 {
+    /// <summary>
+    /// 传感器类型
+    /// </summary>
     public enum SensorType : int
     {
         Temperature = 0,

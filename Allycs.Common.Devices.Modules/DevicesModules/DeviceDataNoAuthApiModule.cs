@@ -29,13 +29,28 @@
             _logger = logger;
 
             Post("/data", _ => UploadDeviceDataAsync());
-            Post("/", _ => UploadDeviceDataAsync());
+            //TODO 改为需要身份验证
+            Get("/data", _ => GetDeviceDataAsync());
         }
 
         private async Task<Response> UploadDeviceDataAsync()
         {
             var cmd = this.Bind<SensorDataDto>();
+            if(cmd.Id.IsNullOrWhiteSpace()||cmd.Id.Length!=24)
+                return Forbidden("设备不存在！");
+            var existDevice = await _devicesService.ExistDeviceInfoAsync(cmd.Id).ConfigureAwait(false);
+            if (!existDevice)
+                return Forbidden("设备不存在！");
+            await _devicesService.NewMultisensorDeviceDataAsync(cmd).ConfigureAwait(false);
             return Ok(cmd);
+        }
+
+        private async Task<Response> GetDeviceDataAsync()
+        {
+            var cmd = this.BindAndValidate<GetDeviceDataListCmd>();
+            var plQuery = this.BindAndValidate<PagedListQuery>();
+            var result = await _devicesService.GetDeviceDataSAsync(cmd, plQuery).ConfigureAwait(false);
+            return Ok(result);
         }
     }
 }

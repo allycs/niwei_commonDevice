@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Allycs.Common.Devices.Services.Implementations
+namespace Allycs.Common.Devices.Services
 {
     using Allycs.Common.Devices.Dtos;
     using Allycs.Common.Devices.Entities;
