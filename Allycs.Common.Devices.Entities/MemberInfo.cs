@@ -13,6 +13,10 @@ namespace Allycs.Common.Devices.Entities
         public SexType Sex { get; set; }
         public string Alias { get; set; }
         public string Avatar { get; set; }
+        /// <summary>
+        /// 职业
+        /// </summary>
+        public string Occupation { get; set; }
         public string Telephone { get; set; }
         public string MobilePhone { get; set; }
         public MemberLevel Level { get; set; } = MemberLevel.Bronze;

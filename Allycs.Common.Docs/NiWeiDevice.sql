@@ -42,7 +42,7 @@ CREATE TABLE device_info
 	address character varying(1024) NULL,
 	status integer NOT NULL,
 	type integer NOT NULL,
-	regist_token character(24) NOT NULL,
+	regist_by character(24) NOT NULL,
 	modified_on timestamp NULL,
     regist_on timestamp NOT NULL
 );
@@ -97,6 +97,7 @@ CREATE TABLE member_info (
 	sex int NOT NULL Default 0,
 	alias character varying(128) NULL, 
 	avatar character varying(256) NULL,
+	occupation character varying(256) NULL,
 	telephone character varying(36) NULL,
 	mobile_phone character varying(36) NOT NULL, 
 	level int NOT NULL DEFAULT 0,
@@ -119,6 +120,25 @@ CREATE TABLE member_info (
 	subscribe_on timestamp NULL,
 	regist_code character(24) NULL,
 	remark character varying(1024) NUll,
+	created_on timestamp NOT NULL, 
+	modified_on timestamp
+);
+CREATE TABLE farm_info (
+	id character(24) primary key ,
+	name character varying(128) NUll,
+	longitude double precision NULL,
+	latitude double precision NULL,
+	description character varying(512) NULL,
+	remark character varying(512) NULL,
+	address character varying(1024) NULL,
+	telephone character varying(36) NULL,								----值班电话
+	type int NOT NULL DEFAULT 0,
+	person_liable character(24) NULL,									----责任人
+	divisions_full_name  character varying(128) NULL,
+	main_img character varying(128) NULL,
+	main_monitor_url character varying(256) NULL,
+	status integer NOT NULL,											----状态
+	referee_id character(24) NULL,
 	created_on timestamp NOT NULL, 
 	modified_on timestamp
 );

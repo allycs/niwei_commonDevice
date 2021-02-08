@@ -15,6 +15,7 @@ namespace Allycs.Common.Devices.Dtos
         /// 职业
         /// </summary>
         public string Occupation { get; set; }
+        public MemberType Tyope { get; set; }
         public string Telephone { get; set; }
         public string MobilePhone { get; set; }
         public string Email { get; set; }
