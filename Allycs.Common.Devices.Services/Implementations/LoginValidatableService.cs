@@ -14,17 +14,20 @@
         private readonly IMemberService _memberService;
         private readonly IMemberLoginLogService _memberLoginLogService;
         private readonly IVerificationCodeService _verificationCodeService;
+        private readonly IValidatableCodeService _validatableCodeService;
 
         public LoginValidatableService(IOptionsSnapshot<AppSettings> option,
             IMemberService memberService,
             IMemberLoginLogService memberLoginLogService,
             IVerificationCodeService verificationCodeService,
+            IValidatableCodeService validatableCodeService,
             ILogger<LoginValidatableService> logger)
             : base(option)
         {
             _logger = logger;
             _memberService = memberService;
             _verificationCodeService = verificationCodeService;
+            _validatableCodeService = validatableCodeService;
             _memberLoginLogService = memberLoginLogService;
         }
 
@@ -95,8 +98,11 @@
                 return "密码超长";
             if (cmd.CheckCode.IsNullOrWhiteSpace())
                 return "验证码必填";
-            if (cmd.CheckCode.Length != 6)
-                return "验证码错误";
+            //if (cmd.CheckCode.Length != 6)
+            //    return "验证码错误";
+            var codeCheckStr = await _validatableCodeService.CheckRegistCodeAsync(cmd.CheckCode, clientIp).ConfigureAwait(false);
+            if(!codeCheckStr.IsNullOrWhiteSpace())
+                return codeCheckStr;
             if (!cmd.IdCard.IsNullOrWhiteSpace() && (await _memberService.ExistIdCardAsync(cmd.IdCard).ConfigureAwait(false)))
                 return "用户身份证号已使用";
             if (await _memberService.ExistAccountAsync(cmd.Account).ConfigureAwait(false))

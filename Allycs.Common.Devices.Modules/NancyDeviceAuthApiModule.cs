@@ -1,18 +1,19 @@
-﻿namespace Allycs.Common.Devices.Modules
+﻿using Allycs.Common.Devices.Services;
+using Allycs.Core;
+using Nancy;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Allycs.Common.Devices.Modules
 {
-    using Services;
-    using Nancy;
-    using Newtonsoft.Json;
-    using System;
-    using System.Linq;
-    using Allycs.Core;
-
-    public class NancyAuthApiModule : BaseNancyModule
+    public class NancyDeviceAuthApiModule : BaseNancyModule
     {
-        internal  readonly IMemberTokenService _memberTokenService;
-        internal readonly IMemberService _memberService;
+        protected readonly IMemberTokenService _memberTokenService;
+        protected readonly IMemberService _memberService;
 
-        public NancyAuthApiModule(IMemberTokenService memberTokenService, IMemberService memberService, string modulePath="") : base("member", "api", modulePath)
+        public NancyDeviceAuthApiModule(IMemberTokenService memberTokenService, IMemberService memberService, string modulePath = "") : base("device", "api", modulePath)
         {
             _memberTokenService = memberTokenService;
             _memberService = memberService;
@@ -92,6 +93,8 @@
                 var memberToken = _memberTokenService.GetMemberTokenAsync(token).Result;
                 CurrentToken = token;
                 var memberEntity = _memberService.GetMemberInfoAsync(memberToken.MemberId).Result;
+                if (memberEntity.Type != MemberType.Administrator && memberEntity.Type != MemberType.SystemAdministrator)
+                    return PreconditionFailed("用户权限不足");
                 CurrentMemberId = memberToken.MemberId;
                 CurrentMemberType = memberEntity.Type;
                 CurrentMemberMobilePhone = memberEntity.MobilePhone;

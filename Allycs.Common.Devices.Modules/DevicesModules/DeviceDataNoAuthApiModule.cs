@@ -47,7 +47,7 @@
 
         private async Task<Response> GetDeviceDataAsync()
         {
-            var cmd = this.BindAndValidate<GetDeviceDataListCmd>();
+            var cmd = this.Bind<GetDeviceDataListCmd>();
             var plQuery = this.BindAndValidate<PagedListQuery>();
             var result = await _devicesService.GetDeviceDataSAsync(cmd, plQuery).ConfigureAwait(false);
             return Ok(result);

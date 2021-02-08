@@ -16,14 +16,20 @@ namespace Allycs.Common.Devices
         /// </summary>
         Administrator = 10,
 
-        Person=20,
+        Person = 20,
         Normal = 21,
 
-        Organization =30,
+        Organization = 30,
 
-        School=40,
-        Teacher=42,
-        Student=43
+        School = 40,
+        Teacher = 42,
+        Student = 43,
+
+        /// <summary>
+        /// 专家
+        /// </summary>
+        Expert = 50
+
 
     }
 }

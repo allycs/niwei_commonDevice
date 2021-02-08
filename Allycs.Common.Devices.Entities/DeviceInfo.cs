@@ -20,7 +20,7 @@
         public string Address { get; set; }
         public DeviceStatus Status { get; set; }
         public DeviceType Type { get; set; }
-        public string RegistToken { get; set; } = ObjectId.NewId();
+        public string RegistBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
         public DateTime RegistOn { get; set; } = DateTime.Now;
     }

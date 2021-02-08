@@ -38,6 +38,7 @@ namespace Allycs.Common.Devices.Modules.MemberApiModules
             _verificationCodeService = verificationCodeService;
             _memberLoginLogService = memberLoginLogService;
             _logger = logger;
+            Post("/test/debug/init", _ => InitDebugData());
             Post("/login", _ => DoLoginAsync());
             Post("/regist", _ => DoRegistAsync());
             Post("/logout", _ => DoLogoutAsync());
@@ -45,7 +46,7 @@ namespace Allycs.Common.Devices.Modules.MemberApiModules
 
         private async Task<Response> DoLoginAsync()
         {
-            var cmd = this.BindAndValidate<LoginCmd>();
+            var cmd = this.Bind<LoginCmd>();
             if (!ModelValidationResult.IsValid)
                 return BadRequest();
             var timeNow = DateTime.Now;
@@ -57,9 +58,7 @@ namespace Allycs.Common.Devices.Modules.MemberApiModules
 
         private async Task<Response> DoLogoutAsync()
         {
-            var cmd = this.BindAndValidate<LogoutCmd>();
-            if (!ModelValidationResult.IsValid)
-                return BadRequest();
+            var cmd = this.Bind<LogoutCmd>();
             await _memberTokenService.DoLogoutAsync(cmd.Token).ConfigureAwait(false);
             return Ok("安全登出");
         }
@@ -88,9 +87,7 @@ namespace Allycs.Common.Devices.Modules.MemberApiModules
 
         private async Task<Response> DoRegistAsync()
         {
-            var cmd = this.BindAndValidate<RegistCmd>();
-            if (!ModelValidationResult.IsValid)
-                return BadRequest(ModelValidationResult.Errors.First().Value.ToString());
+            var cmd = this.Bind<RegistCmd>();
 
             var timeNow = DateTime.Now;
             var err = await _loginValidatableService.CheckRegistCmdValidatableAsync(cmd, ClientIP, timeNow).ConfigureAwait(false);
@@ -121,6 +118,43 @@ namespace Allycs.Common.Devices.Modules.MemberApiModules
             await _memberService.NewMemberAccountAsync(new MemberAccount
             {
                 Account = cmd.MobilePhone,
+                MemberId = entity.Id,
+                Password = password,
+                PasswordFormat = passwordFormat,
+                PasswordSalt = passwordSalt
+            });
+            return Ok(entity);
+        }
+
+        private async Task<Response> InitDebugData()
+        {
+            var timeNow = DateTime.Now;
+            var entity =new MemberInfo { 
+                Id=ObjectId.NewId(),
+                Realname="崔朝辉",
+                Sex= SexType.Unknown,
+                Telephone="16653555299",
+                MobilePhone="16653555299",
+                Type= MemberType.SystemAdministrator,
+                Email="allycs@126.com",
+                IdCard = "370000000000000000",
+                CreatedOn= timeNow,
+                ModifiedOn=timeNow
+            };
+            try
+            {
+                await _memberService.NewMemberInfoAsync(entity).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("LoginModule=regist路由出现后端错误：" + e.Message);
+            }
+            var passwordFormat = EnumHelper.Random(PasswordFormatType.None);
+            var passwordSalt = HashGenerator.Salt();
+            var password = HashGenerator.Encode("123456", passwordFormat, passwordSalt);
+            await _memberService.NewMemberAccountAsync(new MemberAccount
+            {
+                Account = "allycs",
                 MemberId = entity.Id,
                 Password = password,
                 PasswordFormat = passwordFormat,

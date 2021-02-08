@@ -11,6 +11,10 @@ namespace Allycs.Common.Devices.Dtos
         public string Alias { get; set; }
         public string Avatar { get; set; }
         public string Account { get; set; }
+        /// <summary>
+        /// 职业
+        /// </summary>
+        public string Occupation { get; set; }
         public string Telephone { get; set; }
         public string MobilePhone { get; set; }
         public string Email { get; set; }
@@ -20,6 +24,10 @@ namespace Allycs.Common.Devices.Dtos
         public string RegistCode { get; set; }
         public string CheckCode { get; set; }
         public CodeType CodeType { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
         public string Password { get; set; }
     }
 }

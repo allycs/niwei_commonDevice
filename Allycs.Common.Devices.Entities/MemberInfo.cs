@@ -46,7 +46,6 @@ namespace Allycs.Common.Devices.Entities
 
         public DateTime? SubscribeOn { get; set; }
         public string RegistCode { get; set; }
-        public string SeaAreaMessageDigestFive { get; set; }
         public string Remark { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? ModifiedOn { get; set; }

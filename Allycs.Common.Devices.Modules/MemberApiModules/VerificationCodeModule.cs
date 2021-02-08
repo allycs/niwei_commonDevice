@@ -49,9 +49,7 @@
 
         private async Task<Response> GetCodeAsync()
         {
-            var cmd = this.BindAndValidate<VerificationCodeCmd>();
-            if (!ModelValidationResult.IsValid)
-                return BadRequest(ModelValidationResult.Errors.First().Value.ToString());
+            var cmd = this.Bind<VerificationCodeCmd>();
             var timeNow = DateTime.Now;
             var err = await _validatableCodeService.CheckVerificationCodeCmdValidatableAsync(cmd, ClientIP, timeNow).ConfigureAwait(false);
             if (!err.IsNullOrWhiteSpace())

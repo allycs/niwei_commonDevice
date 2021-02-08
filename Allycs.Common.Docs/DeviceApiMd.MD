@@ -36,3 +36,24 @@
 
 
 ```
+
+## Device
+>  `POST */device` 传感器(设备)注册上传  管理原权限接口
+>> 伪JSON格式（请使用标准JSON）没有的数据不传
+``` 
+请求体
+{
+	"deviceCode":"唯一必填",
+	"deviceName":"必填",
+	"SerialNumber":"必填",
+	"Longitude":5,		//非必填
+	"Latitude":1,		//非必填
+	"configJson":"json格式配置参数",	//非必填
+	"remark":"",		//非必填
+	"address":"",		//非必填
+	"status":10,		// 0 失效，10 使用，90 故障
+	"type":0			//0 多传感器，1， 单传感器，10 其它
+}
+
+
+```

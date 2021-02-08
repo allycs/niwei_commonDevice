@@ -15,8 +15,6 @@ namespace Allycs.Common.Devices.Modules.MemberApiModules
 {
     public class ManageModule : NancyAuthApiModule
     {
-        private readonly IMemberService _memberService;
-        private readonly IMemberTokenService _memberTokenService;
         private readonly IVerificationCodeService _verificationCodeService;
         private IValidatableCodeService _validatableCodeService;
         private readonly ILoginValidatableService _loginValidatableService;
@@ -33,8 +31,6 @@ namespace Allycs.Common.Devices.Modules.MemberApiModules
         IMemberLoginLogService memberLoginLogService,
             ILogger<ManageModule> logger) : base(memberTokenService, memberService)
         {
-            _memberService = memberService;
-            _memberTokenService = memberTokenService;
             _loginValidatableService = loginValidatableService;
             _verificationCodeService = verificationCodeService;
             _validatableCodeService = validatableCodeService;
@@ -56,9 +52,7 @@ namespace Allycs.Common.Devices.Modules.MemberApiModules
         }
         private async Task<Response> DoRenewPasswordAsync()
         {
-            var cmd = this.BindAndValidate<RenewPasswordCmd>();
-            if (!ModelValidationResult.IsValid)
-                return BadRequest(ModelValidationResult.Errors.First().Value.ToString());
+            var cmd = this.Bind<RenewPasswordCmd>();
 
             var timeNow = DateTime.Now;
             var err = await _loginValidatableService.CheckRenewPasswordCmdValidatableAsync(CurrentMemberId, cmd, ClientIP, timeNow).ConfigureAwait(false);

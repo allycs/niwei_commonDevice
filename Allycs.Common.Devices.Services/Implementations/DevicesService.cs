@@ -28,7 +28,16 @@
             using var conn = CreateConnection();
             return (await conn.RecordCountAsync<DeviceInfo>($" WHERE id='{id}'").ConfigureAwait(false)) > 0;
         }
-
+        public async Task<bool> ExistDeviceInfoByDeviceCodeAsync(string deviceCode)
+        {
+            using var conn = CreateConnection();
+            return (await conn.RecordCountAsync<DeviceInfo>($" WHERE device_code='{deviceCode}'").ConfigureAwait(false)) > 0;
+        }
+        public async Task<bool> ExistDeviceInfoByDeviceSerialNumberAsync(string serialNumber)
+        {
+            using var conn = CreateConnection();
+            return (await conn.RecordCountAsync<DeviceInfo>($" WHERE serial_number='{serialNumber}'").ConfigureAwait(false)) > 0;
+        }
         public async Task<bool> NewDeviceInfoAsync(DeviceInfo entity)
         {
             using var conn = CreateConnection();
