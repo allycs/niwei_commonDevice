@@ -134,7 +134,24 @@ CREATE TABLE farm_info (
 	telephone character varying(36) NULL,								----值班电话
 	type int NOT NULL DEFAULT 0,
 	person_liable character(24) NULL,									----责任人
-	divisions_full_name  character varying(128) NULL,
+	main_img character varying(128) NULL,
+	main_monitor_url character varying(256) NULL,
+	status integer NOT NULL,											----状态
+	referee_id character(24) NULL,
+	created_on timestamp NOT NULL, 
+	modified_on timestamp
+);
+CREATE TABLE images  (
+	id character(24) primary key ,
+	name character varying(128) NUll,
+	longitude double precision NULL,
+	latitude double precision NULL,
+	description character varying(512) NULL,
+	remark character varying(512) NULL,
+	address character varying(1024) NULL,
+	telephone character varying(36) NULL,								----值班电话
+	type int NOT NULL DEFAULT 0,
+	person_liable character(24) NULL,									----责任人
 	main_img character varying(128) NULL,
 	main_monitor_url character varying(256) NULL,
 	status integer NOT NULL,											----状态
