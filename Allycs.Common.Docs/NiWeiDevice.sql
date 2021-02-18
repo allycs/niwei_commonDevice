@@ -134,10 +134,8 @@ CREATE TABLE farm_info (
 	telephone character varying(36) NULL,								----值班电话
 	type int NOT NULL DEFAULT 0,
 	person_liable character(24) NULL,									----责任人
-	main_img character varying(128) NULL,
-	main_monitor_url character varying(256) NULL,
+	main_img character varying(256) NULL,
 	status integer NOT NULL,											----状态
-	referee_id character(24) NULL,
 	created_on timestamp NOT NULL, 
 	modified_on timestamp
 );
