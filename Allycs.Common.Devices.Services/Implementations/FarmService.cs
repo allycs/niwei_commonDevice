@@ -1,16 +1,14 @@
-﻿using Allycs.Common.Devices.Dtos;
-using Allycs.Common.Devices.Entities;
-using Allycs.Core;
-using Dapper;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Allycs.Common.Devices.Services.Implementations
+﻿namespace Allycs.Common.Devices.Services
 {
+    using Dtos;
+    using Entities;
+    using Allycs.Core;
+    using Dapper;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
     public class FarmService : PostgresService, IFarmService
     {
         private readonly AppSettings _settings;
@@ -47,6 +45,7 @@ namespace Allycs.Common.Devices.Services.Implementations
             using var conn = CreateConnection();
             return await conn.GetAsync<FarmInfo>(id).ConfigureAwait(false);
         }
+
         private SqlAndDps FarmInfoFilterSql(GetFarmInfoListCmd cmd)
         {
             var paras = new DynamicParameters();
@@ -79,6 +78,7 @@ namespace Allycs.Common.Devices.Services.Implementations
 
             return new SqlAndDps { Sql = sql, Dps = paras };
         }
+
         public async Task<IEnumerable<FarmInfo>> GetFarmInfosAsync(GetFarmInfoListCmd cmd, PagedListQuery plQuery)
         {
             using (var conn = CreateConnection())

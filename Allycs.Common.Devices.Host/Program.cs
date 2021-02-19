@@ -40,8 +40,8 @@ namespace Allycs.Common.Devices.Host
 #if DEBUG
                 .UseUrls("http://0.0.0.0:52800")
 #else
-                //.UseUrls("http://0.0.0.0:80")
-                .UseUrls("http://0.0.0.0:52800")
+                .UseUrls("http://0.0.0.0:80")
+                //.UseUrls("http://0.0.0.0:52800")
 #endif
                 .UseKestrel()
                 .UseIISIntegration()

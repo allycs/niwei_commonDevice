@@ -239,6 +239,13 @@
     <None Update="Views\IndexView\index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Views\RootView\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="FarmApiModules\" />
   </ItemGroup>
 
 </Project>
