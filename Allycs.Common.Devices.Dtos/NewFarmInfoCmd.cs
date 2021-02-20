@@ -1,14 +1,10 @@
-﻿namespace Allycs.Common.Devices.Entities
+﻿namespace Allycs.Common.Devices.Dtos
 {
-    using Allycs.Core;
-    using Dapper;
+    using Nancy;
     using System;
 
-    public class FarmInfo
+    public class NewFarmInfoCmd
     {
-        [Key]
-        public string Id { get; set; } = ObjectId.NewId();
-
         public string Name { get; set; }
         public double Longitude { get; set; }
         public double Latitude { get; set; }
@@ -18,10 +14,7 @@
         public string Telephone { get; set; }
         public FarmType? Type { get; set; }
         public string PersonLiable { get; set; }
-        public string MainImg { get; set; }
+        public HttpFile MainImg { get; set; }
         public FarmStatus Status { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime? ModifiedOn { get; set; }
     }
 }

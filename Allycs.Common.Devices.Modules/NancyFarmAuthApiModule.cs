@@ -1,13 +1,11 @@
-﻿using Allycs.Common.Devices.Services;
-using Allycs.Core;
-using Nancy;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Allycs.Common.Devices.Modules
+﻿namespace Allycs.Common.Devices.Modules
 {
+    using Services;
+    using Allycs.Core;
+    using Nancy;
+    using System;
+    using System.Linq;
+
     public class NancyDeviceAuthApiModule : BaseNancyModule
     {
         protected readonly IMemberTokenService _memberTokenService;
@@ -25,21 +23,25 @@ namespace Allycs.Common.Devices.Modules
             get;
             private set;
         }
+
         protected ObjectId CurrentMemberId
         {
             get;
             private set;
         }
+
         protected MemberType CurrentMemberType
         {
             get;
             private set;
         }
+
         protected string CurrentMemberMobilePhone
         {
             get;
             private set;
         }
+
         public ClientType CurrentClientType { get; private set; }
 
         /// <summary>
@@ -50,6 +52,7 @@ namespace Allycs.Common.Devices.Modules
         private Response CheckAuth(NancyContext ctx)
         {
             #region Token
+
             var token = string.Empty;
             var hasTokenHeader = ctx.Request.Headers.Keys.Contains("X-Token");
             if (hasTokenHeader)
@@ -66,8 +69,11 @@ namespace Allycs.Common.Devices.Modules
             }
             if (token.IsNullOrWhiteSpace())
                 return Unauthorized("请重新获取身份令牌");
-            #endregion
+
+            #endregion Token
+
             #region ClientType
+
             var intClientType = (int)ClientType.Mobile;
             var hasClientTypeHeader = ctx.Request.Headers.Keys.Contains("X-ClientType");
             var clientTypeStr = string.Empty;
@@ -86,7 +92,8 @@ namespace Allycs.Common.Devices.Modules
                 int.TryParse(Context.Request.Query["clientType"].Value, out intClientType);
             }
             CurrentClientType = (ClientType)intClientType;
-            #endregion
+
+            #endregion ClientType
 
             if (_memberTokenService.ExistAvailableTokenAsync(token, (ClientType)intClientType).Result)
             {

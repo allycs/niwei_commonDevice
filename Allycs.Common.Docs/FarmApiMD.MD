@@ -1,4 +1,20 @@
-# http://47.108.194.100:52800/allycs/server/device/v1/api
+# http://47.108.194.100:52800/allycs/server/farm/v1/api
+
+## FarmInfoGET
+>  `GET */farms` 获取农场列表
+>> 伪JSON格式（请使用标准JSON）没有的数据不传
+``` 
+请求体
+{
+	"Name":"农场名称",
+	"Remark":"农场备注",
+	"Address":"农场地址",
+	"Telephone":"农场电话",
+	"Type":"农场类型",	//非必填，暂定0
+	"page":1,
+	"limit":25
+}
+``` 
 
 ## DeviceDataUP
 >  `POST */data` 传感器数据上传
@@ -22,20 +38,6 @@
 
 
 ```
-## DeviceDataGET
->  `GET */data` 传感器数据获取
->> 伪JSON格式（请使用标准JSON）没有的数据不传
-``` 
-请求体
-{
-	"type":传感器类型,		//Temperature = 0,Humidity = 1,CarbonDioxide = 2,AcidBase = 3,Nitrogen = 4,Phosphorus = 5,Potassium = 6,Illuminance = 7
-	"StartOn":"开始时间",
-	"EndOn":"结束时间",
-	"DeviceId":"设备ID",
-	"page":1,
-	"limit":25
-}
-
 
 ```
 
