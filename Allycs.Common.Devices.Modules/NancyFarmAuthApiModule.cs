@@ -8,12 +8,12 @@ using System.Text;
 
 namespace Allycs.Common.Devices.Modules
 {
-    public class NancyFarmAuthApiModule : BaseNancyModule
+    public class NancyDeviceAuthApiModule : BaseNancyModule
     {
         protected readonly IMemberTokenService _memberTokenService;
         protected readonly IMemberService _memberService;
 
-        public NancyFarmAuthApiModule(IMemberTokenService memberTokenService, IMemberService memberService, string modulePath = "") : base("farm", "api", modulePath)
+        public NancyDeviceAuthApiModule(IMemberTokenService memberTokenService, IMemberService memberService, string modulePath = "") : base("device", "api", modulePath)
         {
             _memberTokenService = memberTokenService;
             _memberService = memberService;

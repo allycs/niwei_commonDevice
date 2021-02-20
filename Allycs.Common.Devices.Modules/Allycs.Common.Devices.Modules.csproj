@@ -245,7 +245,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="FarmApiModules\" />
+    <Folder Include="CommonApiModules\" />
   </ItemGroup>
 
 </Project>

@@ -91,7 +91,7 @@
 
                 var demo = DeviceDataFilterSql(cmd);
                 sql += demo.Sql;
-                sql += " ORDER BY created_on DESC ";
+                sql += " ORDER BY update_on DESC ";
                 sql += plQuery.PostgresLimitPartialSql();
                 return await conn.QueryAsync<DeviceData>(sql, demo.Dps).ConfigureAwait(false);
             }
