@@ -17,23 +17,22 @@
 ``` 
 
 ## DeviceDataUP
->  `POST */data` 传感器数据上传
+>  `POST */farm` 传感器数据上传
 >> 伪JSON格式（请使用标准JSON）没有的数据不传
 ``` 
 请求体
 {
-	"id":"24位",
-	"temperature":3724,
-	"humidity":37,
-	"carbonDioxide":34,
-	"acidBase":5,
-	"nitrogen":1,
-	"phosphorus":2,
-	"potassium":3,
-	"deviceType":1,
-	"remark":"12121",
-	"information":"121212",
-	"updateOn":"2020/12/28"
+	"name":"农场名称",
+	"longitude":121.1,
+	"latitude":37.1,
+	"description":"农场描述",
+	"remark":"备注",
+	"address":"农场地址",
+	"telephone":"农场电话",
+	"type":0,
+	"PersonLiable":"负责人ID",
+	"mainImg":HTTPFile类型,		//该属性可不在json中
+	"status":0
 }
 
 

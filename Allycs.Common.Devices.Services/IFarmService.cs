@@ -11,7 +11,7 @@
         Task<bool> ExistFarmInfoByNameAsync(string farmName);
         Task<bool> ExistFarmInfoByTelephoneAsync(string telephone);
         Task<bool> NewFarmInfoAsync(FarmInfo entity);
-        Task<string> NewFarmInfoAsync(NewFarmInfoCmd cmd);
+        Task<string> NewFarmInfoAsync(NewFarmInfoCmd cmd,string currentMemberId);
         Task<FarmInfo> GetFarmInfoAsync(string id);
         Task<bool> UpdateFarmInfoAsync(FarmInfo entity);
         Task<IEnumerable<FarmInfo>> GetFarmInfosAsync(GetFarmInfoListCmd cmd, PagedListQuery plQuery);

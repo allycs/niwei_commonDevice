@@ -10,6 +10,7 @@
     using System.Threading.Tasks;
     using System;
     using System.Linq;
+    using System.IO;
 
     public class FarmService : PostgresService, IFarmService
     {
@@ -23,7 +24,17 @@
             _settings = option.Value;
             _logger = logger;
         }
+        public string GetUploadDirectory()
+        {
+            var uploadDirectory = Path.Combine(Environment.CurrentDirectory, _settings.UploadDirectory);
 
+            if (!Directory.Exists(uploadDirectory))
+            {
+                Directory.CreateDirectory(uploadDirectory);
+            }
+
+            return uploadDirectory;
+        }
         public async Task<bool> ExistFarmInfoAsync(string id)
         {
             using var conn = CreateConnection();
@@ -95,66 +106,45 @@
                 return await conn.QueryAsync<FarmInfo>(sql, demo.Dps).ConfigureAwait(false);
             }
         }
-        public async Task<string> NewFarmInfoAsync(NewFarmInfoCmd cmd)
+        public async Task<string> NewFarmInfoAsync(NewFarmInfoCmd cmd, string currentMemberId)
         {
             var timeNow = DateTime.Now;
             var extension = cmd.MainImg.Name.Split('.').LastOrDefault();
             var fileName = ObjectId.NewId();
             var fileFullName = fileName + "." + extension;
             var path = Path.Combine(GetUploadDirectory(), fileFullName);
-            var MD5 = HashGenerator.GetFileMD5(cmd.ClientFile.Value);
-
             using (FileStream destinationStream = File.Create(path))
             {
-                await cmd.ClientFile.Value.CopyToAsync(destinationStream).ConfigureAwait(false);
+                await cmd.MainImg.Value.CopyToAsync(destinationStream).ConfigureAwait(false);
             }
-            var id = 0;
-            if (cmd.Type == SoftClientType.Android)
-                fileFullName = @"http://www.radar365.top:28000/rs_app_release/v" + cmd.Version.Replace('.', '_') + @"/app-release.apk";
+
             using (var conn = CreateConnection())
             {
-                id = await conn.InsertAsync<int>(new SoftClientVersion
+                var farmInfo = new FarmInfo
                 {
-                    ClientName = cmd.Type == SoftClientType.Android ? "安卓" + cmd.Version + "版" : cmd.Type == SoftClientType.PCClient ? "Win" + cmd.Version + "版" : "服务" + cmd.Version + "版",
-                    SoftClientType = cmd.Type,
+                    Name = cmd.Name,
+                    Longitude = cmd.Longitude,
+                    Latitude = cmd.Latitude,
                     Description = cmd.Description,
-                    Version = cmd.Version,
-                    VersionCode = cmd.VersionCode,
                     Remark = cmd.Remark,
-                    FileSize = cmd.ClientFile.Value.Length,
-                    Extension = extension,
-                    MessageDigestFive = MD5,
-                    FileName = fileName,
-                    FileUrl = fileFullName,
-                    ForceUpdate = cmd.ForceUpdate.Value,
-                    IgnoreableUpdate = cmd.IgnoreableUpdate.Value,
-                    ModifiedBy = currentMemberId,
-                    ModifiedOn = timeNow,
+                    Address = cmd.Address,
+                    Telephone = cmd.Telephone,
+                    Type = cmd.Type,
+                    PersonLiable = cmd.PersonLiable,
+                    Status = cmd.Status,
                     CreatedBy = currentMemberId,
-                    CreatedOn = timeNow
-                }).ConfigureAwait(false);
+                    CreatedOn = timeNow,
+                    ModifiedOn = timeNow
+                };
+                await conn.InsertAsync<FarmInfo>(farmInfo).ConfigureAwait(false);
+
+                return farmInfo.Id;
             };
-            return id;
-            var farmInfo = new FarmInfo
-            {
-                Name = cmd.Name,
-                Longitude = cmd.Longitude,
-                Latitude = cmd.Latitude,
-                Description = cmd.Description,
-                Remark = cmd.Remark,
-                Address = cmd.Address,
-                Telephone = cmd.Telephone,
-                Type = cmd.Type,
-                PersonLiable = cmd.PersonLiable,
-                Status = cmd.Status,
-                CreatedBy = CurrentMemberId,
-                CreatedOn = timeNow,
-                ModifiedOn = timeNow
-            };
+
         }
         public async Task<bool> NewFarmInfoAsync(FarmInfo entity)
         {
-           
+
             using var conn = CreateConnection();
             return await conn.InsertAsync<FarmInfo>(entity).ConfigureAwait(false);
         }

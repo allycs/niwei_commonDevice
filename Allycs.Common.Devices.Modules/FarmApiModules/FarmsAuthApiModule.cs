@@ -38,14 +38,10 @@ namespace Allycs.Common.Devices.Modules.FarmApiModules
             var fileCount = Request.Files.Count();
             if (fileCount != 1) return PreconditionFailed("请上传主图");
             cmd.MainImg = Request.Files.FirstOrDefault();
-            var timeNow = DateTime.Now;
             var err = await _farmValidatableService.CheckNewFarmInfoCmdValidatableAsync(cmd).ConfigureAwait(false);
             if (!err.IsNullOrWhiteSpace())
                 return PreconditionFailed(err);
-           
-            if (await _farmService.NewFarmInfoAsync(farmInfo).ConfigureAwait(false))
-                return Ok(farmInfo.Id);
-            return Conflict("服务端请求冲突,请联系管理员！" );
+            return Ok(await _farmService.NewFarmInfoAsync(cmd, CurrentMemberId).ConfigureAwait(false));
         }
     }
 }
