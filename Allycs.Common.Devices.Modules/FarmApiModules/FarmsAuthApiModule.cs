@@ -30,8 +30,21 @@ namespace Allycs.Common.Devices.Modules.FarmApiModules
             _farmService = farmService;
             _farmValidatableService = farmValidatableService;
             Post("/farm", _ => NewDeviceAsync());
-
+            Post("/update/farm", _ => UpdateFarmAsync());
         }
+
+        private async Task<Response> UpdateFarmAsync()
+        {
+            var cmd = this.Bind<UpdateFarmInfoCmd>();
+            var fileCount = Request.Files.Count();
+            if (fileCount > 0)
+                cmd.MainImg = Request.Files.FirstOrDefault();
+            var err = await _farmValidatableService.CheckNewFarmInfoCmdValidatableAsync(cmd).ConfigureAwait(false);
+            if (!err.IsNullOrWhiteSpace())
+                return PreconditionFailed(err);
+            return Ok(await _farmService.NewFarmInfoAsync(cmd, CurrentMemberId).ConfigureAwait(false));
+        }
+
         private async Task<Response> NewDeviceAsync()
         {
             var cmd = this.Bind<NewFarmInfoCmd>();

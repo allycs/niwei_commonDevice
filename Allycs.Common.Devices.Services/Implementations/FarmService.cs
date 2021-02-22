@@ -126,6 +126,7 @@
                     Longitude = cmd.Longitude,
                     Latitude = cmd.Latitude,
                     Description = cmd.Description,
+                    MainImg= fileName,
                     Remark = cmd.Remark,
                     Address = cmd.Address,
                     Telephone = cmd.Telephone,
@@ -133,6 +134,7 @@
                     PersonLiable = cmd.PersonLiable,
                     Status = cmd.Status,
                     CreatedBy = currentMemberId,
+                    ModifiedBy=currentMemberId,
                     CreatedOn = timeNow,
                     ModifiedOn = timeNow
                 };
@@ -153,6 +155,51 @@
         {
             using var conn = CreateConnection();
             return await conn.UpdateAsync(entity).ConfigureAwait(false) > 0;
+        }
+        public async Task<string> UpdateFarmInfoAsync(UpdateFarmInfoCmd cmd, string currentMemberId)
+        {
+            var timeNow = DateTime.Now;
+            var farmInfo = await GetFarmInfoAsync(cmd.Id).ConfigureAwait(false);
+            farmInfo.ModifiedOn = timeNow;
+            farmInfo.ModifiedBy = currentMemberId;
+            if(cmd.MainImg!=null)
+            {
+                var extension = cmd.MainImg.Name.Split('.').LastOrDefault();
+                var fileName = ObjectId.NewId();
+                var fileFullName = fileName + "." + extension;
+                var path = Path.Combine(GetUploadDirectory(), fileFullName);
+                using (FileStream destinationStream = File.Create(path))
+                {
+                    await cmd.MainImg.Value.CopyToAsync(destinationStream).ConfigureAwait(false);
+                }
+                farmInfo.MainImg = fileName;
+            }
+            if (!cmd.Name.IsNullOrWhiteSpace())
+                farmInfo.Name = cmd.Name.Trim();
+            if (cmd.Longitude.HasValue)
+                farmInfo.Longitude = cmd.Longitude.Value;
+            if (cmd.Latitude.HasValue)
+                farmInfo.Latitude = cmd.Latitude.Value;
+            if (!cmd.Description.IsNullOrWhiteSpace() & cmd.Description.Trim() != farmInfo.Description)
+                farmInfo.Description = cmd.Description.Trim();
+            if (!cmd.Remark.IsNullOrWhiteSpace() && cmd.Remark.Trim() != farmInfo.Remark)
+                farmInfo.Remark = cmd.Remark.Trim();
+            if (!cmd.Address.IsNullOrWhiteSpace() && cmd.Address.Trim() != farmInfo.Address)
+                farmInfo.Address = cmd.Address.Trim();
+            if (!cmd.Telephone.IsNullOrWhiteSpace() && cmd.Telephone.Trim() != farmInfo.Telephone)
+                farmInfo.Telephone = cmd.Telephone.Trim();
+            if (cmd.Type.HasValue && cmd.Type != farmInfo.Type)
+                farmInfo.Type = cmd.Type.Value;
+            if (!cmd.PersonLiable.IsNullOrWhiteSpace() && cmd.PersonLiable.Trim() != farmInfo.PersonLiable)
+                farmInfo.PersonLiable = cmd.PersonLiable.Trim();
+            if (cmd.Status.HasValue && cmd.Status.Value != farmInfo.Status)
+                farmInfo.Status = cmd.Status.Value;
+            using (var conn = CreateConnection())
+            {
+                await conn.UpdateAsync(farmInfo).ConfigureAwait(false);
+                return farmInfo.Id;
+            };
+
         }
     }
 }

@@ -9,5 +9,6 @@ namespace Allycs.Common.Devices.Services
     public  interface IFarmValidatableService
     {
         Task<string> CheckNewFarmInfoCmdValidatableAsync(NewFarmInfoCmd cmd);
+        Task<string> CheckUpdateFarmInfoCmdValidatableAsync(UpdateFarmInfoCmd cmd);
     }
 }

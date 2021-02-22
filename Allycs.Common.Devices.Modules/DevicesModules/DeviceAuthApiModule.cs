@@ -1,23 +1,21 @@
-﻿using Allycs.Common.Devices.Dtos;
-using Allycs.Common.Devices.Entities;
-using Allycs.Common.Devices.Services;
-using Allycs.Core;
-using Microsoft.Extensions.Logging;
-using Nancy;
-using Nancy.ModelBinding;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Allycs.Common.Devices.Modules.DevicesModules
+﻿namespace Allycs.Common.Devices.Modules.DevicesModules
 {
+    using Dtos;
+    using Entities;
+    using Services;
+    using Allycs.Core;
+    using Microsoft.Extensions.Logging;
+    using Nancy;
+    using Nancy.ModelBinding;
+    using System;
+    using System.Threading.Tasks;
+
     public class DeviceAuthApiModule : NancyDeviceAuthApiModule
     {
         protected readonly ILogger<DeviceAuthApiModule> _logger;
         private readonly IDevicesService _devicesService;
         private readonly IDeviceValidatableService _deviceValidatableService;
+
         public DeviceAuthApiModule(
             IMemberService memberService,
             IMemberTokenService memberTokenService,
@@ -25,13 +23,13 @@ namespace Allycs.Common.Devices.Modules.DevicesModules
             IDeviceValidatableService deviceValidatableService,
             ILogger<DeviceAuthApiModule> logger) : base(memberTokenService, memberService)
         {
-
             _logger = logger;
             _devicesService = devicesService;
             _deviceValidatableService = deviceValidatableService;
             Post("/device", _ => NewDeviceAsync());
-
+            Post("/update/device", _ => UpdateDeviceAsync());
         }
+
         private async Task<Response> NewDeviceAsync()
         {
             var cmd = this.Bind<NewDeviceInfoCmd>();
@@ -47,6 +45,7 @@ namespace Allycs.Common.Devices.Modules.DevicesModules
                 SerialNumber = cmd.SerialNumber,
                 Longitude = cmd.Longitude,
                 Latitude = cmd.Latitude,
+                Description = cmd.Description,
                 ConfigJson = cmd.ConfigJson,
                 Remark = cmd.Remark,
                 Address = cmd.Address,
@@ -58,7 +57,7 @@ namespace Allycs.Common.Devices.Modules.DevicesModules
             };
             if (await _devicesService.NewDeviceInfoAsync(deviceInfo).ConfigureAwait(false))
                 return Ok(deviceInfo);
-            return Conflict("服务端请求冲突,请联系管理员！" );
+            return Conflict("服务端请求冲突,请联系管理员！");
         }
     }
 }
