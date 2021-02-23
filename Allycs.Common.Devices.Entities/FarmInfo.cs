@@ -19,6 +19,7 @@
         public FarmType? Type { get; set; }
         public string PersonLiable { get; set; }
         public string MainImg { get; set; }
+        public string Extension { get; set; }
         public FarmStatus Status { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }

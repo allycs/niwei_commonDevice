@@ -26,7 +26,7 @@
         }
         public string GetUploadDirectory()
         {
-            var uploadDirectory = Path.Combine(Environment.CurrentDirectory, _settings.UploadDirectory);
+            var uploadDirectory = Path.Combine(Environment.CurrentDirectory, _settings.UploadImageDirectory);
 
             if (!Directory.Exists(uploadDirectory))
             {
@@ -127,6 +127,7 @@
                     Latitude = cmd.Latitude,
                     Description = cmd.Description,
                     MainImg= fileName,
+                    Extension=extension,
                     Remark = cmd.Remark,
                     Address = cmd.Address,
                     Telephone = cmd.Telephone,
@@ -173,6 +174,7 @@
                     await cmd.MainImg.Value.CopyToAsync(destinationStream).ConfigureAwait(false);
                 }
                 farmInfo.MainImg = fileName;
+                farmInfo.Extension = extension;
             }
             if (!cmd.Name.IsNullOrWhiteSpace())
                 farmInfo.Name = cmd.Name.Trim();

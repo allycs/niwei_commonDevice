@@ -135,6 +135,7 @@ CREATE TABLE farm_info (
 	type int NOT NULL DEFAULT 0,
 	person_liable character(24) NULL,									----责任人
 	main_img character varying(256) NULL,
+	extension character varying(32) NULL,
 	status integer NOT NULL,											----状态
 	created_on timestamp NOT NULL, 
 	created_by character(24) NOT NULL,
@@ -144,7 +145,7 @@ CREATE TABLE farm_info (
 CREATE TABLE images  (
 	id character(24) primary key ,
 	name character varying(128) NUll,
-	
+	extension character varying(32) NULL,
 	description character varying(512) NULL,
 	remark character varying(512) NULL,
 	type int NOT NULL DEFAULT 0,

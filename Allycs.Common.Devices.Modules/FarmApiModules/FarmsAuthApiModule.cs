@@ -39,10 +39,10 @@ namespace Allycs.Common.Devices.Modules.FarmApiModules
             var fileCount = Request.Files.Count();
             if (fileCount > 0)
                 cmd.MainImg = Request.Files.FirstOrDefault();
-            var err = await _farmValidatableService.CheckNewFarmInfoCmdValidatableAsync(cmd).ConfigureAwait(false);
+            var err = await _farmValidatableService.CheckUpdateFarmInfoCmdValidatableAsync(cmd).ConfigureAwait(false);
             if (!err.IsNullOrWhiteSpace())
                 return PreconditionFailed(err);
-            return Ok(await _farmService.NewFarmInfoAsync(cmd, CurrentMemberId).ConfigureAwait(false));
+            return Ok(await _farmService.UpdateFarmInfoAsync(cmd, CurrentMemberId).ConfigureAwait(false));
         }
 
         private async Task<Response> NewDeviceAsync()

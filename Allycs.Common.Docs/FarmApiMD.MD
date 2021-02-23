@@ -43,7 +43,7 @@
 >  `POST */update/farm` 修改农场信息
 >> 伪JSON格式（请使用标准JSON）没有的数据不传
 ``` 
-请求体
+
 请求体
 {
 	"id":"农场ID",
@@ -59,5 +59,14 @@
 	"mainImg":HTTPFile类型,		//该属性可不在json中
 	"status":0
 }
+
+```
+
+## GetFarmImage
+>  `GET */image/{id}/{extension}` 获取农场图片
+>> 伪JSON格式（请使用标准JSON）没有的数据不传
+``` 
+
+请求体
 
 ```

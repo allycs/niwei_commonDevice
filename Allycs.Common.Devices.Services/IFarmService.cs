@@ -7,6 +7,7 @@
 
     public interface IFarmService
     {
+        string GetUploadDirectory();
         Task<bool> ExistFarmInfoAsync(string id);
         Task<bool> ExistFarmInfoByNameAsync(string farmName);
         Task<bool> ExistFarmInfoByTelephoneAsync(string telephone);

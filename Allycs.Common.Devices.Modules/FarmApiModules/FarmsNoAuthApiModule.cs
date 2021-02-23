@@ -7,6 +7,7 @@ using Nancy;
 using Nancy.ModelBinding;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,6 +28,13 @@ namespace Allycs.Common.Devices.Modules.FarmApiModules
             _logger = logger;
 
             Get("/farms", _ => GetFarmListAsync());
+            Get("/image/{id}/{extension}", p => GetFarmImage((string)p.id,(string)p.extension));
+        }
+
+        private Response GetFarmImage(string id,string extension)
+        {
+            var failPath = Path.Combine(_farmService.GetUploadDirectory(), id + "." + extension);
+            return Response.AsFile(failPath);
         }
 
         private async Task<Response> GetFarmListAsync()
