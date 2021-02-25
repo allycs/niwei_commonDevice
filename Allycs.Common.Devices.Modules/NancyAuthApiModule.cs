@@ -11,13 +11,18 @@
     {
         internal  readonly IMemberTokenService _memberTokenService;
         internal readonly IMemberService _memberService;
-
-        public NancyAuthApiModule(IMemberTokenService memberTokenService, IMemberService memberService, string modulePath="") : base("member", "api", modulePath)
+        public NancyAuthApiModule(IMemberTokenService memberTokenService, IMemberService memberService,string mathod="member",string func="api", string modulePath = "") : base(mathod, func, modulePath)
         {
             _memberTokenService = memberTokenService;
             _memberService = memberService;
             Before += CheckAuth;
         }
+        //public NancyAuthApiModule(IMemberTokenService memberTokenService, IMemberService memberService, string modulePath="") : base("member", "api", modulePath)
+        //{
+        //    _memberTokenService = memberTokenService;
+        //    _memberService = memberService;
+        //    Before += CheckAuth;
+        //}
 
         protected ObjectId CurrentToken
         {
