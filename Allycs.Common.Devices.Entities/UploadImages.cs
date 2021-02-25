@@ -1,5 +1,6 @@
 ﻿namespace Allycs.Common.Devices.Entities
 {
+    using Allycs.Core;
     using System;
 
     public class UploadImages

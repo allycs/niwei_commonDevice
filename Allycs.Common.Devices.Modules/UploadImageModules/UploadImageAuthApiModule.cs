@@ -1,37 +1,49 @@
-﻿using Allycs.Common.Devices.Dtos;
-using Allycs.Common.Devices.Entities;
-using Allycs.Common.Devices.Services;
-using Allycs.Core;
-using Microsoft.Extensions.Logging;
-using Nancy;
-using Nancy.ModelBinding;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Allycs.Common.Devices.Modules.FarmApiModules
+﻿namespace Allycs.Common.Devices.Modules.FarmApiModules
 {
+    using Dtos;
+    using Services;
+    using Microsoft.Extensions.Logging;
+    using Nancy;
+    using Nancy.ModelBinding;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using System.IO;
+
     public class UploadImageAuthApiModule : NancyAuthApiModule
     {
         protected readonly ILogger<UploadImageAuthApiModule> _logger;
-        private readonly IFarmService _farmService;
+        private readonly IUploadImagesService _uploadImagesService;
         private readonly IFarmValidatableService _farmValidatableService;
+
         public UploadImageAuthApiModule(
             IMemberService memberService,
             IMemberTokenService memberTokenService,
-            IFarmService farmService,
+            IUploadImagesService uploadImagesService,
             IFarmValidatableService farmValidatableService,
-            ILogger<UploadImageAuthApiModule> logger) : base(memberTokenService, memberService,"upload-image")
+            ILogger<UploadImageAuthApiModule> logger) : base(memberTokenService, memberService, "upload-image")
         {
-
             _logger = logger;
-            _farmService = farmService;
+            _uploadImagesService = uploadImagesService;
             _farmValidatableService = farmValidatableService;
             Post("/upload", _ => UploadImageAsync());
+            Get("/list", _ => GetUploadImagesAsync());
+            Get("/image/{id}/{extension}", p => GetUploadImage((string)p.id,(string)p.extension));
         }
 
+        private Response GetUploadImage(string id,string extension)
+        {
+            var failPath = Path.Combine(_uploadImagesService.GetUploadDirectory(), id + "." + extension);
+            return Response.AsFile(failPath);
+        }
+
+        private async Task<Response> GetUploadImagesAsync()
+        {
+            var cmd = this.Bind<GetUploadImageListCmd>();
+            var plQuery = this.Bind<PagedListQuery>();
+            var result = await _uploadImagesService.GetFarmInfosAsync(cmd, plQuery).ConfigureAwait(false);
+            return Ok(result);
+        }
 
         private async Task<Response> UploadImageAsync()
         {
@@ -43,10 +55,10 @@ namespace Allycs.Common.Devices.Modules.FarmApiModules
             {
                 cmd.Images.Add(item);
             }
-            var err = await _farmValidatableService.CheckNewFarmInfoCmdValidatableAsync(cmd).ConfigureAwait(false);
-            if (!err.IsNullOrWhiteSpace())
-                return PreconditionFailed(err);
-            return Ok(await _farmService.NewFarmInfoAsync(cmd, CurrentMemberId).ConfigureAwait(false));
+            //var err = await _.CheckNewFarmInfoCmdValidatableAsync(cmd).ConfigureAwait(false);
+            //if (!err.IsNullOrWhiteSpace())
+            //    return PreconditionFailed(err);
+            return Ok(await _uploadImagesService.NewUploadImageAsync(cmd, CurrentMemberId).ConfigureAwait(false));
         }
     }
 }

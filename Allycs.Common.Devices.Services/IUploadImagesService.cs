@@ -7,7 +7,8 @@
 
     public interface IUploadImagesService
     {
-        Task<bool> NewUploadImageAsync(UploadImages entity);
+        string GetUploadDirectory();
+        Task<bool> NewUploadImageAsync(UploadImagesCmd entity,string currentMemberId);
 
         Task<UploadImages> GetUploadImageAsync(string id);
         Task<IEnumerable<UploadImages>> GetFarmInfosAsync(GetUploadImageListCmd cmd, PagedListQuery plQuery);

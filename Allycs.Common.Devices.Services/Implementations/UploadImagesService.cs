@@ -50,6 +50,21 @@
                 sql += " AND type = @type ";
                 paras.Add("type", cmd.Type.Value);
             }
+            if (!cmd.CreatedBy.IsNullOrWhiteSpace())
+            {
+                sql += " AND created_by = @createdBy ";
+                paras.Add("createdBy", cmd.CreatedBy.Trim());
+            }
+            if (!cmd.RefereeId.IsNullOrWhiteSpace())
+            {
+                sql += " AND referee_id = @refereeId ";
+                paras.Add("refereeId", cmd.RefereeId.Trim());
+            }
+            if (cmd.Status.HasValue && (int)cmd.Status.Value != -1)
+            {
+                sql += " AND status = @status ";
+                paras.Add("status", cmd.Status.Value);
+            }
             if (!cmd.Name.IsNullOrWhiteSpace())
             {
                 sql += " AND name LIKE @name ";
@@ -60,130 +75,64 @@
                 sql += " AND remark LIKE @remark ";
                 paras.Add("remark", "%" + cmd.Remark.Trim() + "%");
             }
-            if (!cmd.Address.IsNullOrWhiteSpace())
+            if (!cmd.Extension.IsNullOrWhiteSpace())
             {
-                sql += " AND address LIKE @address ";
-                paras.Add("address", "%" + cmd.Address.Trim() + "%");
+                sql += " AND extension LIKE @extension ";
+                paras.Add("extension", "%" + cmd.Extension.Trim() + "%");
             }
-            if (!cmd.Telephone.IsNullOrWhiteSpace())
+            if (!cmd.Description.IsNullOrWhiteSpace())
             {
-                sql += " AND telephone LIKE @telephone ";
-                paras.Add("telephone", "%" + cmd.Telephone.Trim() + "%");
+                sql += " AND description LIKE @description ";
+                paras.Add("description", "%" + cmd.Description.Trim() + "%");
             }
 
             return new SqlAndDps { Sql = sql, Dps = paras };
         }
 
-        public async Task<IEnumerable<FarmInfo>> GetFarmInfosAsync(GetFarmInfoListCmd cmd, PagedListQuery plQuery)
+        public async Task<IEnumerable<UploadImages>> GetFarmInfosAsync(GetUploadImageListCmd cmd, PagedListQuery plQuery)
         {
             using (var conn = CreateConnection())
             {
                 conn.Open();
-                var sql = "SELECT * FROM farm_info WHERE ";
+                var sql = "SELECT * FROM upload_images WHERE ";
 
                 var demo = UploadImageFilterSql(cmd);
                 sql += demo.Sql;
                 sql += " ORDER BY created_on DESC ";
                 sql += plQuery.PostgresLimitPartialSql();
-                return await conn.QueryAsync<FarmInfo>(sql, demo.Dps).ConfigureAwait(false);
+                return await conn.QueryAsync<UploadImages>(sql, demo.Dps).ConfigureAwait(false);
             }
         }
-        public async Task<string> NewFarmInfoAsync(NewFarmInfoCmd cmd, string currentMemberId)
+        public async Task<bool> NewUploadImageAsync(UploadImagesCmd cmd, string currentMemberId)
         {
             var timeNow = DateTime.Now;
-            var extension = cmd.MainImg.Name.Split('.').LastOrDefault();
-            var fileName = ObjectId.NewId();
-            var fileFullName = fileName + "." + extension;
-            var path = Path.Combine(GetUploadDirectory(), fileFullName);
-            using (FileStream destinationStream = File.Create(path))
-            {
-                await cmd.MainImg.Value.CopyToAsync(destinationStream).ConfigureAwait(false);
-            }
-
-            using (var conn = CreateConnection())
-            {
-                var farmInfo = new FarmInfo
-                {
-                    Name = cmd.Name,
-                    Longitude = cmd.Longitude,
-                    Latitude = cmd.Latitude,
-                    Description = cmd.Description,
-                    MainImg= fileName,
-                    Extension=extension,
-                    Remark = cmd.Remark,
-                    Address = cmd.Address,
-                    Telephone = cmd.Telephone,
-                    Type = cmd.Type,
-                    PersonLiable = cmd.PersonLiable,
-                    Status = cmd.Status,
-                    CreatedBy = currentMemberId,
-                    ModifiedBy=currentMemberId,
-                    CreatedOn = timeNow,
-                    ModifiedOn = timeNow
-                };
-                await conn.InsertAsync<FarmInfo>(farmInfo).ConfigureAwait(false);
-
-                return farmInfo.Id;
-            };
-
-        }
-        public async Task<bool> NewFarmInfoAsync(FarmInfo entity)
-        {
-
-            using var conn = CreateConnection();
-            return await conn.InsertAsync<FarmInfo>(entity).ConfigureAwait(false);
-        }
-
-        public async Task<bool> UpdateFarmInfoAsync(FarmInfo entity)
-        {
-            using var conn = CreateConnection();
-            return await conn.UpdateAsync(entity).ConfigureAwait(false) > 0;
-        }
-        public async Task<string> UpdateFarmInfoAsync(UpdateFarmInfoCmd cmd, string currentMemberId)
-        {
-            var timeNow = DateTime.Now;
-            var farmInfo = await GetFarmInfoAsync(cmd.Id).ConfigureAwait(false);
-            farmInfo.ModifiedOn = timeNow;
-            farmInfo.ModifiedBy = currentMemberId;
-            if(cmd.MainImg!=null)
-            {
-                var extension = cmd.MainImg.Name.Split('.').LastOrDefault();
-                var fileName = ObjectId.NewId();
-                var fileFullName = fileName + "." + extension;
+            foreach (var item in cmd.Images)
+            { var id = ObjectId.NewId();
+                var extension = item.Name.Split('.').LastOrDefault();
+                
+                var fileFullName = id + "." + extension;
                 var path = Path.Combine(GetUploadDirectory(), fileFullName);
-                using (FileStream destinationStream = File.Create(path))
-                {
-                    await cmd.MainImg.Value.CopyToAsync(destinationStream).ConfigureAwait(false);
-                }
-                farmInfo.MainImg = fileName;
-                farmInfo.Extension = extension;
-            }
-            if (!cmd.Name.IsNullOrWhiteSpace())
-                farmInfo.Name = cmd.Name.Trim();
-            if (cmd.Longitude.HasValue)
-                farmInfo.Longitude = cmd.Longitude.Value;
-            if (cmd.Latitude.HasValue)
-                farmInfo.Latitude = cmd.Latitude.Value;
-            if (!cmd.Description.IsNullOrWhiteSpace() & cmd.Description.Trim() != farmInfo.Description)
-                farmInfo.Description = cmd.Description.Trim();
-            if (!cmd.Remark.IsNullOrWhiteSpace() && cmd.Remark.Trim() != farmInfo.Remark)
-                farmInfo.Remark = cmd.Remark.Trim();
-            if (!cmd.Address.IsNullOrWhiteSpace() && cmd.Address.Trim() != farmInfo.Address)
-                farmInfo.Address = cmd.Address.Trim();
-            if (!cmd.Telephone.IsNullOrWhiteSpace() && cmd.Telephone.Trim() != farmInfo.Telephone)
-                farmInfo.Telephone = cmd.Telephone.Trim();
-            if (cmd.Type.HasValue && cmd.Type != farmInfo.Type)
-                farmInfo.Type = cmd.Type.Value;
-            if (!cmd.PersonLiable.IsNullOrWhiteSpace() && cmd.PersonLiable.Trim() != farmInfo.PersonLiable)
-                farmInfo.PersonLiable = cmd.PersonLiable.Trim();
-            if (cmd.Status.HasValue && cmd.Status.Value != farmInfo.Status)
-                farmInfo.Status = cmd.Status.Value;
-            using (var conn = CreateConnection())
-            {
-                await conn.UpdateAsync(farmInfo).ConfigureAwait(false);
-                return farmInfo.Id;
-            };
+                using FileStream destinationStream = File.Create(path);
+                await item.Value.CopyToAsync(destinationStream).ConfigureAwait(false);
 
+                using (var conn = CreateConnection())
+                {
+                    var farmInfo = new UploadImages
+                    {
+                        Name = cmd.Name.IsNullOrWhiteSpace()?id.ToString():(cmd.Name+"_"+id),
+                        Extension = extension,
+                        Description = cmd.Description,
+                        Remark = cmd.Remark,
+                        Type = cmd.Type,
+                        Status = cmd.Status,
+                        RefereeId=cmd.RefereeId,
+                        CreatedBy = currentMemberId,
+                        CreatedOn = timeNow,
+                    };
+                    await conn.InsertAsync<FarmInfo>(farmInfo).ConfigureAwait(false);
+                };
+            }
+            return true;
         }
     }
 }
